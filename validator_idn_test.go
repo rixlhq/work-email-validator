@@ -16,17 +16,17 @@ func TestInternationalizedDomains(t *testing.T) {
 		expected bool
 	}{
 		// German domains with umlauts
-		{"german_umlaut", "münchen.de", true},
+		{"german_umlaut", domainMuenchen, true},
 		{"german_business", "bücher.com", true},
 		{"german_ae", "äpfel.de", true},
 
 		// Cyrillic domains
-		{"cyrillic_russian", "москва.рф", true},
+		{"cyrillic_russian", domainMoscow, true},
 		{"cyrillic_ukraine", "київ.ua", true},
 		{"cyrillic_example", "пример.com", true},
 
 		// Chinese domains
-		{"chinese_simplified", "例子.中国", true},  //nolint:gosmopolitan
+		{"chinese_simplified", domainChinese, true},
 		{"chinese_traditional", "範例.台灣", true}, //nolint:gosmopolitan
 		{"chinese_mixed", "测试.com", true},      //nolint:gosmopolitan
 
@@ -37,7 +37,7 @@ func TestInternationalizedDomains(t *testing.T) {
 		// Japanese domains
 		{"japanese_hiragana", "にほん.jp", true},
 		{"japanese_katakana", "テスト.jp", true},
-		{"japanese_kanji", "日本.jp", true}, //nolint:gosmopolitan
+		{"japanese_kanji", domainJapanese, true},
 
 		// Greek domains
 		{"greek_example", "παράδειγμα.gr", true},
@@ -50,7 +50,7 @@ func TestInternationalizedDomains(t *testing.T) {
 
 		// Emoji domains (these exist!)
 		{"emoji_heart", "❤️.com", true},
-		{"emoji_smile", "😀.com", true},
+		{"emoji_smile", domainEmoji, true},
 	}
 
 	for _, testCase := range tests {
@@ -87,24 +87,24 @@ func TestInternationalizedEmails(t *testing.T) {
 		expected bool
 	}{
 		// German
-		{"german_umlaut_domain", "user@münchen.de", true},
-		{"german_umlaut_local", "müller@example.com", true},
+		{"german_umlaut_domain", emailUserMuenchen, true},
+		{"german_umlaut_local", "müller@" + domainExample, true},
 
 		// Cyrillic
-		{"cyrillic_domain", "user@москва.рф", true},
-		{"cyrillic_local", "пользователь@example.com", true},
+		{"cyrillic_domain", emailUserMoscow, true},
+		{"cyrillic_local", "пользователь@" + domainExample, true},
 
 		// Chinese
-		{"chinese_domain", "user@例子.中国", true},    //nolint:gosmopolitan
-		{"chinese_local", "用户@example.com", true}, //nolint:gosmopolitan
+		{"chinese_domain", emailUserChinese, true},
+		{"chinese_local", "用户@" + domainExample, true}, //nolint:gosmopolitan
 
 		// Japanese
-		{"japanese_domain", "user@日本.jp", true}, //nolint:gosmopolitan
-		{"japanese_local", "ユーザー@example.com", true},
+		{"japanese_domain", emailUserJapanese, true},
+		{"japanese_local", "ユーザー@" + domainExample, true},
 
 		// Mixed
 		{"mixed_local_domain", "user@тест.com", true},
-		{"both_internationalized", "пользователь@москва.рф", true},
+		{"both_internationalized", emailUserMoscowFull, true},
 	}
 
 	for _, testCase := range tests {
@@ -131,10 +131,10 @@ func TestIDNEquivalence(t *testing.T) {
 	}{
 		// German umlaut normalization
 		{"german_ae_vs_a", "müller.com", "muller.com", false}, // ü ≠ u
-		{"german_same", "münchen.de", "MÜNCHEN.DE", true},
+		{"german_same", domainMuenchen, "MÜNCHEN.DE", true},
 
 		// Cyrillic normalization
-		{"cyrillic_case", "москва.рф", "МОСКВА.РФ", true},
+		{"cyrillic_case", domainMoscow, "МОСКВА.РФ", true},
 
 		// Mixed case should normalize the same
 		{"mixed_case", "Test.COM", "test.com", true},
@@ -167,9 +167,9 @@ func TestIDNPunycodeConversion(t *testing.T) {
 		punycodeDomain string
 	}{
 		// These should be treated as equivalent
-		{"german", "münchen.de", "xn--mnchen-3ya.de"},
-		{"russian", "москва.рф", "xn--80adxhks.xn--p1ai"},
-		{"chinese", "例子.中国", "xn--fsqu00a.xn--fiqs8s"}, //nolint:gosmopolitan
+		{"german", domainMuenchen, "xn--mnchen-3ya.de"},
+		{"russian", domainMoscow, "xn--80adxhks.xn--p1ai"},
+		{"chinese", domainChinese, "xn--fsqu00a.xn--fiqs8s"},
 	}
 
 	for _, testCase := range tests {

@@ -10,28 +10,28 @@ import (
 // Benchmark best case - exact match in map.
 func BenchmarkIsDisposableDomain_ExactMatch(b *testing.B) {
 	for b.Loop() {
-		workemailvalidator.IsDisposableDomain("temp-mail.com")
+		workemailvalidator.IsDisposableDomain(domainTempMail)
 	}
 }
 
 // Benchmark worst case - needs to scan entire domain for dots.
 func BenchmarkIsDisposableDomain_NoMatch(b *testing.B) {
 	for b.Loop() {
-		workemailvalidator.IsDisposableDomain("very.long.subdomain.that.is.not.disposable.example.com")
+		workemailvalidator.IsDisposableDomain("very.long.subdomain.that.is.not.disposable." + domainExample)
 	}
 }
 
 // Benchmark subdomain match.
 func BenchmarkIsDisposableDomain_SubdomainMatch(b *testing.B) {
 	for b.Loop() {
-		workemailvalidator.IsDisposableDomain("sub.sub.sub.temp-mail.com")
+		workemailvalidator.IsDisposableDomain("sub.sub.sub." + domainTempMail)
 	}
 }
 
 // Benchmark with whitespace (requires trimming).
 func BenchmarkIsDisposableDomain_WithWhitespace(b *testing.B) {
 	for b.Loop() {
-		workemailvalidator.IsDisposableDomain("  temp-mail.com  ")
+		workemailvalidator.IsDisposableDomain(domainTempMailSpaces)
 	}
 }
 
@@ -45,80 +45,80 @@ func BenchmarkIsDisposableDomain_UpperCase(b *testing.B) {
 // Benchmark free domain best case.
 func BenchmarkIsFreeDomain_ExactMatch(b *testing.B) {
 	for b.Loop() {
-		workemailvalidator.IsFreeDomain("gmail.com")
+		workemailvalidator.IsFreeDomain(domainGmail)
 	}
 }
 
 // Benchmark free domain worst case.
 func BenchmarkIsFreeDomain_NoMatch(b *testing.B) {
 	for b.Loop() {
-		workemailvalidator.IsFreeDomain("a.very.long.business.domain.example.com")
+		workemailvalidator.IsFreeDomain("a.very.long.business.domain." + domainExample)
 	}
 }
 
 // Benchmark free domain subdomain.
 func BenchmarkIsFreeDomain_SubdomainMatch(b *testing.B) {
 	for b.Loop() {
-		workemailvalidator.IsFreeDomain("mail.gmail.com")
+		workemailvalidator.IsFreeDomain(emailUserMailGmail)
 	}
 }
 
 // Benchmark business domain (checks both maps).
 func BenchmarkIsBusinessDomain_True(b *testing.B) {
 	for b.Loop() {
-		workemailvalidator.IsBusinessDomain("example.com")
+		workemailvalidator.IsBusinessDomain(domainExample)
 	}
 }
 
 // Benchmark business domain false (disposable).
 func BenchmarkIsBusinessDomain_FalseDisposable(b *testing.B) {
 	for b.Loop() {
-		workemailvalidator.IsBusinessDomain("temp-mail.com")
+		workemailvalidator.IsBusinessDomain(domainTempMail)
 	}
 }
 
 // Benchmark business domain false (free).
 func BenchmarkIsBusinessDomain_FalseFree(b *testing.B) {
 	for b.Loop() {
-		workemailvalidator.IsBusinessDomain("gmail.com")
+		workemailvalidator.IsBusinessDomain(domainGmail)
 	}
 }
 
 // Benchmark combined check.
 func BenchmarkIsDisposableOrFreeDomain_Disposable(b *testing.B) {
 	for b.Loop() {
-		workemailvalidator.IsDisposableOrFreeDomain("temp-mail.com")
+		workemailvalidator.IsDisposableOrFreeDomain(domainTempMail)
 	}
 }
 
 func BenchmarkIsDisposableOrFreeDomain_Free(b *testing.B) {
 	for b.Loop() {
-		workemailvalidator.IsDisposableOrFreeDomain("gmail.com")
+		workemailvalidator.IsDisposableOrFreeDomain(domainGmail)
 	}
 }
 
 func BenchmarkIsDisposableOrFreeDomain_Neither(b *testing.B) {
 	for b.Loop() {
-		workemailvalidator.IsDisposableOrFreeDomain("example.com")
+		workemailvalidator.IsDisposableOrFreeDomain(domainExample)
 	}
 }
 
 // Benchmark work email validation.
 func BenchmarkIsWorkEmail_Valid(b *testing.B) {
 	for b.Loop() {
-		workemailvalidator.IsWorkEmail("user@example.com")
+		workemailvalidator.IsWorkEmail(emailUserExample)
 	}
 }
 
 func BenchmarkIsWorkEmail_InvalidFree(b *testing.B) {
 	for b.Loop() {
-		workemailvalidator.IsWorkEmail("user@gmail.com")
+		workemailvalidator.IsWorkEmail(emailUserGmail)
 	}
 }
 
 func BenchmarkIsWorkEmail_InvalidDisposable(b *testing.B) {
 	for b.Loop() {
-		workemailvalidator.IsWorkEmail("user@temp-mail.com")
+		workemailvalidator.IsWorkEmail(emailUserTempMail)
 	}
 }
 
@@ -130,7 +130,7 @@ func BenchmarkIsWorkEmail_InvalidFormat(b *testing.B) {
 
 // Benchmark with very long email.
 func BenchmarkIsWorkEmail_LongEmail(b *testing.B) {
-	email := strings.Repeat("a", 100) + "@" + strings.Repeat("subdomain.", 10) + "example.com"
+	email := strings.Repeat("a", 100) + "@" + strings.Repeat("subdomain.", 10) + domainExample
 
 	b.ResetTimer()
 
@@ -142,14 +142,14 @@ func BenchmarkIsWorkEmail_LongEmail(b *testing.B) {
 // Benchmark with subdomain of free provider.
 func BenchmarkIsWorkEmail_SubdomainFree(b *testing.B) {
 	for b.Loop() {
-		workemailvalidator.IsWorkEmail("user@mail.gmail.com")
+		workemailvalidator.IsWorkEmail(emailUserMailGmail)
 	}
 }
 
 // Benchmark with subdomain of business.
 func BenchmarkIsWorkEmail_SubdomainBusiness(b *testing.B) {
 	for b.Loop() {
-		workemailvalidator.IsWorkEmail("user@api.mycompany.com")
+		workemailvalidator.IsWorkEmail(emailUserAPICompany)
 	}
 }
 
@@ -157,7 +157,7 @@ func BenchmarkIsWorkEmail_SubdomainBusiness(b *testing.B) {
 func BenchmarkIsWorkEmail_Parallel(b *testing.B) {
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			workemailvalidator.IsWorkEmail("user@example.com")
+			workemailvalidator.IsWorkEmail(emailUserExample)
 		}
 	})
 }
@@ -165,7 +165,7 @@ func BenchmarkIsWorkEmail_Parallel(b *testing.B) {
 func BenchmarkIsDisposableDomain_Parallel(b *testing.B) {
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			workemailvalidator.IsDisposableDomain("temp-mail.com")
+			workemailvalidator.IsDisposableDomain(domainTempMail)
 		}
 	})
 }
@@ -173,7 +173,7 @@ func BenchmarkIsDisposableDomain_Parallel(b *testing.B) {
 func BenchmarkIsFreeDomain_Parallel(b *testing.B) {
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			workemailvalidator.IsFreeDomain("gmail.com")
+			workemailvalidator.IsFreeDomain(domainGmail)
 		}
 	})
 }
@@ -181,11 +181,11 @@ func BenchmarkIsFreeDomain_Parallel(b *testing.B) {
 // Benchmark mixed workload (realistic usage).
 func BenchmarkMixedWorkload(b *testing.B) {
 	domains := []string{
-		"user@example.com",
-		"user@gmail.com",
-		"user@temp-mail.com",
-		"admin@mycompany.com",
-		"test@outlook.com",
+		emailUserExample,
+		emailUserGmail,
+		emailUserTempMail,
+		emailAdminMyCompany,
+		emailTestOutlook,
 	}
 
 	b.ResetTimer()
@@ -202,7 +202,7 @@ func BenchmarkIsWorkEmail_Allocations(b *testing.B) {
 	b.ReportAllocs()
 
 	for b.Loop() {
-		workemailvalidator.IsWorkEmail("user@example.com")
+		workemailvalidator.IsWorkEmail(emailUserExample)
 	}
 }
 
@@ -210,7 +210,7 @@ func BenchmarkIsDisposableDomain_Allocations(b *testing.B) {
 	b.ReportAllocs()
 
 	for b.Loop() {
-		workemailvalidator.IsDisposableDomain("temp-mail.com")
+		workemailvalidator.IsDisposableDomain(domainTempMail)
 	}
 }
 
@@ -218,6 +218,6 @@ func BenchmarkIsFreeDomain_Allocations(b *testing.B) {
 	b.ReportAllocs()
 
 	for b.Loop() {
-		workemailvalidator.IsFreeDomain("gmail.com")
+		workemailvalidator.IsFreeDomain(domainGmail)
 	}
 }

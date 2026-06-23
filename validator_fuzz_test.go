@@ -11,12 +11,12 @@ import (
 func FuzzIsDisposableDomain(f *testing.F) {
 	// Seed with interesting test cases
 	seeds := []string{
-		"temp-mail.com",
-		"TEMP-MAIL.COM",
-		"  temp-mail.com  ",
-		"sub.temp-mail.com",
-		"gmail.com",
-		"example.com",
+		domainTempMail,
+		domainTempMailUpper,
+		domainTempMailSpaces,
+		domainTempMailSub,
+		domainGmail,
+		domainExample,
 		"",
 		".",
 		"..",
@@ -32,8 +32,8 @@ func FuzzIsDisposableDomain(f *testing.F) {
 		"domain@com",
 		"\x00domain.com",
 		"domain.com\x00",
-		"münchen.de",
-		"😀.com",
+		domainMuenchen,
+		domainEmoji,
 	}
 
 	for _, seed := range seeds {
@@ -71,13 +71,13 @@ func FuzzIsDisposableDomain(f *testing.F) {
 // FuzzIsFreeDomain tests IsFreeDomain with random inputs.
 func FuzzIsFreeDomain(f *testing.F) {
 	seeds := []string{
-		"gmail.com",
-		"GMAIL.COM",
-		"  gmail.com  ",
-		"mail.gmail.com",
-		"outlook.com",
-		"yahoo.com",
-		"example.com",
+		domainGmail,
+		domainGmailUpper,
+		domainGmailSpaces,
+		emailUserMailGmail,
+		domainOutlook,
+		domainYahoo,
+		domainExample,
 		"",
 		".",
 		strings.Repeat("x", 500),
@@ -117,10 +117,10 @@ func FuzzIsFreeDomain(f *testing.F) {
 // FuzzIsBusinessDomain tests IsBusinessDomain with random inputs.
 func FuzzIsBusinessDomain(f *testing.F) {
 	seeds := []string{
-		"example.com",
-		"mycompany.com",
-		"gmail.com",
-		"temp-mail.com",
+		domainExample,
+		domainBusiness,
+		domainGmail,
+		domainTempMail,
 		"",
 		"x",
 		strings.Repeat("business", 100),
@@ -169,9 +169,9 @@ func FuzzIsBusinessDomain(f *testing.F) {
 // FuzzIsDisposableOrFreeDomain tests the combined function.
 func FuzzIsDisposableOrFreeDomain(f *testing.F) {
 	seeds := []string{
-		"gmail.com",
-		"temp-mail.com",
-		"example.com",
+		domainGmail,
+		domainTempMail,
+		domainExample,
 		"",
 		"test",
 	}
@@ -202,25 +202,25 @@ func FuzzIsDisposableOrFreeDomain(f *testing.F) {
 
 // FuzzIsWorkEmail tests IsWorkEmail with random inputs
 //
-//nolint:cyclop
+//nolint:cyclop,funlen
 func FuzzIsWorkEmail(f *testing.F) {
 	seeds := []string{
-		"user@example.com",
-		"user@gmail.com",
-		"user@temp-mail.com",
+		emailUserExample,
+		emailUserGmail,
+		emailUserTempMail,
 		"@",
-		"@domain.com",
-		"user@",
+		emailAtDomain,
+		emailUserAtEnd,
 		"",
 		"no-at-sign",
 		"multiple@@at.com",
 		"user@domain@com",
-		strings.Repeat("a", 100) + "@example.com",
-		"user@" + strings.Repeat("sub.", 20) + "example.com",
-		"名前@example.com", //nolint:gosmopolitan
-		"user@münchen.de",
-		"user+tag@example.com",
-		"first.last@example.com",
+		strings.Repeat("a", 100) + emailAtExample,
+		"user@" + strings.Repeat("sub.", 20) + domainExample,
+		emailUnicodeExample,
+		emailUserMuenchen,
+		emailPlusExample,
+		emailDotsExample,
 	}
 
 	for _, seed := range seeds {
@@ -276,13 +276,13 @@ func FuzzIsWorkEmail(f *testing.F) {
 //nolint:cyclop
 func FuzzConsistency(f *testing.F) {
 	seeds := []string{
-		"gmail.com",
-		"temp-mail.com",
-		"example.com",
-		"mycompany.com",
+		domainGmail,
+		domainTempMail,
+		domainExample,
+		domainBusiness,
 		"",
 		"test",
-		"sub.gmail.com",
+		domainGmailSub,
 	}
 
 	for _, seed := range seeds {

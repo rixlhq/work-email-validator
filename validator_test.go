@@ -36,9 +36,9 @@ func TestIsDisposableDomain(t *testing.T) {
 
 	tests := []testCase{
 		// Known disposable domains
-		{"known_disposable", "temp-mail.com", true},
-		{"known_disposable_2", "10minutemail.com", true},
-		{"known_disposable_3", "guerrillamail.com", true},
+		{nameKnownDisposable, domainTempMail, true},
+		{nameKnownDisposable2, domain10MinuteMail, true},
+		{nameKnownDisposable3, "guerrillamail.com", true},
 
 		// Case insensitivity
 		{"uppercase", "TEMP-MAIL.COM", true},
@@ -51,12 +51,12 @@ func TestIsDisposableDomain(t *testing.T) {
 		{"tabs_and_spaces", "\t temp-mail.org \t", true},
 
 		// Non-disposable domains
-		{"gmail_not_disposable", "gmail.com", false},
-		{"business_domain", "example.com", false},
-		{"corporate_domain", "mycompany.com", false},
+		{"gmail_not_disposable", domainGmail, false},
+		{"business_domain", domainExample, false},
+		{"corporate_domain", domainBusiness, false},
 
 		// Edge cases
-		{"empty_string", "", false},
+		{nameEmptyString, "", false},
 		{"single_char", "a", false},
 		{"no_tld", "domain", false},
 		{"just_dot", ".", false},
@@ -65,8 +65,8 @@ func TestIsDisposableDomain(t *testing.T) {
 		{"trailing_dot", "domain.com.", false},
 
 		// Subdomain tests (if parent is disposable)
-		{"subdomain_of_disposable", "sub.temp-mail.com", true},
-		{"deep_subdomain_disposable", "a.b.c.temp-mail.com", true},
+		{"subdomain_of_disposable", domainTempMailSub, true},
+		{"deep_subdomain_disposable", domainTempMailDeepSub, true},
 
 		// Special characters
 		{"hyphen_in_domain", "my-domain.com", false},
@@ -78,8 +78,8 @@ func TestIsDisposableDomain(t *testing.T) {
 		{"long_subdomain", strings.Repeat("sub.", 20) + "domain.com", false},
 
 		// Unicode domains (IDN)
-		{"unicode_domain", "münchen.de", false},
-		{"emoji_domain", "😀.com", false},
+		{"unicode_domain", domainMuenchen, false},
+		{"emoji_domain", domainEmoji, false},
 	}
 
 	runDomainTests(t, tests, workemailvalidator.IsDisposableDomain)
@@ -91,15 +91,15 @@ func TestIsFreeDomain(t *testing.T) {
 
 	tests := []testCase{
 		// Known free domains
-		{"gmail", "gmail.com", true},
-		{"outlook", "outlook.com", true},
+		{"gmail", domainGmail, true},
+		{"outlook", domainOutlook, true},
 		{"yahoo", "yahoo.com", true},
 		{"hotmail", "hotmail.com", true},
 		{"icloud", "icloud.com", true},
 		{"protonmail", "protonmail.com", true},
 
 		// Case insensitivity
-		{"uppercase_gmail", "GMAIL.COM", true},
+		{"uppercase_gmail", domainGmailUpper, true},
 		{"mixedcase_outlook", "OuTlOoK.cOm", true},
 
 		// Whitespace handling
@@ -107,24 +107,24 @@ func TestIsFreeDomain(t *testing.T) {
 		{"tabs_hotmail", "\t\thotmail.com\t\t", true},
 
 		// Non-free domains
-		{"business_domain", "example.com", false},
-		{"disposable_not_free", "temp-mail.com", false},
-		{"corporate", "mycompany.com", false},
+		{"business_domain", domainExample, false},
+		{"disposable_not_free", domainTempMail, false},
+		{"corporate", domainBusiness, false},
 
 		// Edge cases
-		{"empty_string", "", false},
+		{nameEmptyString, "", false},
 		{"single_letter", "g", false},
 		{"incomplete_domain", "gma", false},
 		{"typo_gmail", "gmial.com", false},
 
 		// Subdomains (if parent is free)
-		{"subdomain_gmail", "mail.gmail.com", true},
-		{"subdomain_outlook", "accounts.outlook.com", true},
+		{"subdomain_gmail", emailUserMailGmail, true},
+		{"subdomain_outlook", domainOutlookAccounts, true},
 		{"deep_subdomain_yahoo", "a.b.yahoo.com", true},
 
 		// Edge case subdomains
-		{"empty_subdomain", ".gmail.com", true},
-		{"numeric_subdomain", "123.gmail.com", true},
+		{"empty_subdomain", domainGmailEmptySub, true},
+		{"numeric_subdomain", domainGmailNumericSub, true},
 	}
 
 	runDomainTests(t, tests, workemailvalidator.IsFreeDomain)
@@ -136,16 +136,16 @@ func TestIsDisposableOrFreeDomain(t *testing.T) {
 
 	tests := []testCase{
 		// Free domains
-		{"free_gmail", "gmail.com", true},
-		{"free_outlook", "outlook.com", true},
+		{nameFreeGmail, domainGmail, true},
+		{nameFreeOutlook, domainOutlook, true},
 
 		// Disposable domains
-		{"disposable_tempmail", "temp-mail.com", true},
-		{"disposable_10min", "10minutemail.com", true},
+		{"disposable_tempmail", domainTempMail, true},
+		{"disposable_10min", domain10MinuteMail, true},
 
 		// Business domains (neither)
-		{"business_example", "example.com", false},
-		{"business_corporate", "mycompany.com", false},
+		{"business_example", domainExample, false},
+		{"business_corporate", domainBusiness, false},
 		{"business_custom", "custom-business.io", false},
 
 		// Edge cases
@@ -154,13 +154,13 @@ func TestIsDisposableOrFreeDomain(t *testing.T) {
 		{"invalid_format", "not a domain", false},
 
 		// Mixed cases
-		{"uppercase_free", "GMAIL.COM", true},
-		{"whitespace_disposable", "  temp-mail.com  ", true},
+		{"uppercase_free", domainGmailUpper, true},
+		{"whitespace_disposable", domainTempMailSpaces, true},
 
 		// Subdomains
-		{"subdomain_free", "mail.gmail.com", true},
-		{"subdomain_disposable", "x.temp-mail.com", true},
-		{"subdomain_business", "api.mycompany.com", false},
+		{"subdomain_free", emailUserMailGmail, true},
+		{"subdomain_disposable", domainTempMailXSub, true},
+		{"subdomain_business", domainBusinessSub, false},
 	}
 
 	runDomainTests(t, tests, workemailvalidator.IsDisposableOrFreeDomain)
@@ -172,17 +172,17 @@ func TestIsBusinessDomain(t *testing.T) {
 
 	tests := []testCase{
 		// Business domains
-		{"simple_business", "example.com", true},
-		{"corporate", "mycompany.com", true},
+		{"simple_business", domainExample, true},
+		{"corporate", domainBusiness, true},
 		{"startup", "startupname.io", true},
 		{"enterprise", "bigcorp.net", true},
 
 		// Non-business (free)
-		{"free_gmail", "gmail.com", false},
-		{"free_outlook", "outlook.com", false},
+		{nameFreeGmail, domainGmail, false},
+		{nameFreeOutlook, domainOutlook, false},
 
 		// Non-business (disposable)
-		{"disposable_tempmail", "temp-mail.com", false},
+		{"disposable_tempmail", domainTempMail, false},
 		{"disposable_guerrilla", "guerrillamail.com", false},
 
 		// Edge cases - invalid domain syntax should return false
@@ -192,16 +192,16 @@ func TestIsBusinessDomain(t *testing.T) {
 		{"single_char_tld", "domain.a", false}, // TLD must be at least 2 chars
 
 		// Subdomains of business domains
-		{"business_subdomain", "api.mycompany.com", true},
-		{"business_deep_sub", "v1.api.mycompany.com", true},
+		{"business_subdomain", domainBusinessSub, true},
+		{"business_deep_sub", "v1." + domainBusinessSub, true},
 
 		// Subdomains of free/disposable (should be non-business)
-		{"free_subdomain", "custom.gmail.com", false},
-		{"disposable_subdomain", "test.temp-mail.com", false},
+		{"free_subdomain", domainGmailCustomSub, false},
+		{"disposable_subdomain", domainTempMailTestSub, false},
 
 		// Case and whitespace
 		{"uppercase_business", "EXAMPLE.COM", true},
-		{"whitespace_business", "  example.com  ", true},
+		{"whitespace_business", "  " + domainExample + "  ", true},
 	}
 
 	runDomainTests(t, tests, workemailvalidator.IsBusinessDomain)
@@ -213,25 +213,25 @@ func TestIsWorkEmail(t *testing.T) {
 
 	tests := []testCase{
 		// Valid work emails
-		{"valid_work", "user@mycompany.com", true},
-		{"valid_work_2", "contact@example.com", true},
+		{"valid_work", emailUserMailCompany, true},
+		{"valid_work_2", emailContactExample, true},
 		{"valid_work_subdomain", "admin@mail.company.com", true},
 
 		// Non-work (free)
-		{"free_gmail", "user@gmail.com", false},
-		{"free_outlook", "user@outlook.com", false},
-		{"free_yahoo", "user@yahoo.com", false},
+		{"free_gmail", emailUserGmail, false},
+		{"free_outlook", emailUserOutlook, false},
+		{"free_yahoo", emailUserYahoo, false},
 
 		// Non-work (disposable)
-		{"disposable", "user@temp-mail.com", false},
-		{"disposable_2", "test@10minutemail.com", false},
+		{"disposable", emailUserTempMail, false},
+		{"disposable_2", emailUserTempMailAt, false},
 
 		// Invalid email formats
 		{"no_at_sign", "invalid-email", false},
-		{"empty_string", "", false},
+		{nameEmptyString, "", false},
 		{"only_at", "@", false},
-		{"at_at_start", "@domain.com", false},
-		{"at_at_end", "user@", false},
+		{"at_at_start", emailAtDomain, false},
+		{"at_at_end", emailUserAtEnd, false},
 		// Multiple @ signs - domain extraction uses LastIndexByte
 		// "user@@domain.com" -> "domain.com" (valid and business)
 		// "user@domain@com" -> "com" (invalid - TLD only, fails validation)
@@ -240,39 +240,39 @@ func TestIsWorkEmail(t *testing.T) {
 
 		// Edge cases with @ symbol
 		{"just_domain", "domain.com", false},
-		{"no_local_part", "@domain.com", false},
-		{"no_domain_part", "user@", false},
+		{"no_local_part", emailAtDomain, false},
+		{"no_domain_part", emailUserAtEnd, false},
 
 		// Whitespace
-		{"whitespace_domain", "user@  example.com  ", true},
-		{"whitespace_full", "  user@example.com  ", true},
+		{"whitespace_domain", emailUserWhitespace, true},
+		{"whitespace_full", emailUserWhitespaceFull, true},
 
 		// Case insensitivity
-		{"uppercase_domain", "user@EXAMPLE.COM", true},
-		{"uppercase_free", "user@GMAIL.COM", false},
+		{"uppercase_domain", emailUserExampleUpper, true},
+		{"uppercase_free", emailUserUpperGmail, false},
 
 		// Special characters in local part (should still validate domain)
-		{"plus_addressing", "user+tag@example.com", true},
-		{"dots_in_local", "first.last@example.com", true},
-		{"underscore", "user_name@example.com", true},
-		{"hyphen", "user-name@example.com", true},
+		{"plus_addressing", emailPlusExample, true},
+		{"dots_in_local", emailDotsExample, true},
+		{"underscore", emailUnderscoreExample, true},
+		{"hyphen", emailHyphenExample, true},
 
 		// Subdomain edge cases
-		{"subdomain_business", "user@mail.mycompany.com", true},
-		{"subdomain_free", "user@mail.gmail.com", false},
-		{"subdomain_disposable", "user@x.temp-mail.com", false},
+		{"subdomain_business", emailUserMailCompany, true},
+		{"subdomain_free", emailUserMailGmail, false},
+		{"subdomain_disposable", emailUserXTempMail, false},
 
 		// Multiple @ signs - uses LastIndexByte, so extracts domain after last @
 		// "user@host@company.com" extracts "company.com" which is valid and business
-		{"email_with_at_in_local", "user@host@company.com", true},
+		{"email_with_at_in_local", emailUserHostCompany, true},
 
 		// Very long emails
-		{"long_local_part", strings.Repeat("a", 64) + "@example.com", true},
-		{"long_domain", "user@" + strings.Repeat("sub.", 10) + "example.com", true},
+		{"long_local_part", strings.Repeat("a", 64) + emailAtExample, true},
+		{"long_domain", "user@" + strings.Repeat("sub.", 10) + domainExample, true},
 
 		// Unicode
-		{"unicode_local", "名前@example.com", true}, //nolint:gosmopolitan
-		{"unicode_domain", "user@münchen.de", true},
+		{"unicode_local", emailUnicodeExample, true},
+		{"unicode_domain", emailUserMuenchen, true},
 	}
 
 	runDomainTests(t, tests, workemailvalidator.IsWorkEmail)
@@ -289,17 +289,17 @@ func TestSubdomainHierarchy(t *testing.T) {
 		free       bool
 		business   bool
 	}{
-		{"root_disposable", "temp-mail.com", true, false, false},
-		{"sub_disposable", "test.temp-mail.com", true, false, false},
-		{"deep_sub_disposable", "a.b.c.temp-mail.com", true, false, false},
+		{"root_disposable", domainTempMail, true, false, false},
+		{"sub_disposable", domainTempMailTestSub, true, false, false},
+		{"deep_sub_disposable", domainTempMailDeepSub, true, false, false},
 
-		{"root_free", "gmail.com", false, true, false},
-		{"sub_free", "mail.gmail.com", false, true, false},
-		{"deep_sub_free", "x.y.z.gmail.com", false, true, false},
+		{"root_free", domainGmail, false, true, false},
+		{"sub_free", emailUserMailGmail, false, true, false},
+		{"deep_sub_free", domainGmailDeepSub, false, true, false},
 
-		{"root_business", "example.com", false, false, true},
-		{"sub_business", "api.example.com", false, false, true},
-		{"deep_sub_business", "v2.api.example.com", false, false, true},
+		{"root_business", domainExample, false, false, true},
+		{"sub_business", domainExampleSub, false, false, true},
+		{"deep_sub_business", domainExampleDeepSub, false, false, true},
 	}
 
 	for _, testCase := range tests {
@@ -330,11 +330,11 @@ func TestFunctionConsistency(t *testing.T) {
 	t.Parallel()
 
 	domains := []string{
-		"gmail.com",
-		"temp-mail.com",
-		"example.com",
-		"outlook.com",
-		"mycompany.com",
+		domainGmail,
+		domainTempMail,
+		domainExample,
+		domainOutlook,
+		domainBusiness,
 		"",
 		"invalid",
 	}
