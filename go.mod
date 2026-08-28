@@ -1,6 +1,6 @@
 module github.com/rixlhq/work-email-validator
 
-go 1.27.0
+go 1.26.0
 
 require golang.org/x/net v0.58.0
 
