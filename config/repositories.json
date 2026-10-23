@@ -62,6 +62,7 @@
     "url": "https://raw.githubusercontent.com/willwhite/freemail/master/data/free.txt"
   },
   "exclude_domains": [
+    "domain.com",
     "example.com",
     "example.net",
     "example.org",
