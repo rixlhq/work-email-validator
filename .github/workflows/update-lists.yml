@@ -23,6 +23,14 @@ jobs:
       - name: Update domain lists
         run: bun scripts/update-domains.ts
 
+      - name: Setup Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+
+      - name: Test updated lists
+        run: go test ./...
+
       - name: Auto-commit changes
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
