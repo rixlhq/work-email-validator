@@ -232,10 +232,7 @@ func TestIsWorkEmail(t *testing.T) {
 		{"only_at", "@", false},
 		{"at_at_start", emailAtDomain, false},
 		{"at_at_end", emailUserAtEnd, false},
-		// Multiple @ signs - domain extraction uses LastIndexByte
-		// "user@@domain.com" -> "domain.com" (valid and business)
-		// "user@domain@com" -> "com" (invalid - TLD only, fails validation)
-		{"multiple_at", "user@@domain.com", true},
+		{"multiple_at", "user@@domain.com", false},
 		{"multiple_at_2", "user@domain@com", false},
 
 		// Edge cases with @ symbol
@@ -244,7 +241,7 @@ func TestIsWorkEmail(t *testing.T) {
 		{"no_domain_part", emailUserAtEnd, false},
 
 		// Whitespace
-		{"whitespace_domain", emailUserWhitespace, true},
+		{"whitespace_domain", emailUserWhitespace, false},
 		{"whitespace_full", emailUserWhitespaceFull, true},
 
 		// Case insensitivity
@@ -263,8 +260,7 @@ func TestIsWorkEmail(t *testing.T) {
 		{"subdomain_disposable", emailUserXTempMail, false},
 
 		// Multiple @ signs - uses LastIndexByte, so extracts domain after last @
-		// "user@host@company.com" extracts "company.com" which is valid and business
-		{"email_with_at_in_local", emailUserHostCompany, true},
+		{"email_with_at_in_local", emailUserHostCompany, false},
 
 		// Very long emails
 		{"long_local_part", strings.Repeat("a", 64) + emailAtExample, true},
@@ -382,5 +378,63 @@ func TestFunctionConsistency(t *testing.T) {
 				t.Logf("Warning: %q is marked as both disposable and free", domain)
 			}
 		})
+	}
+}
+
+func TestIsWorkEmailRejectsBypasses(t *testing.T) {
+	t.Parallel()
+
+	tests := []string{
+		"a@gmail.com>",
+		"<a@gmail.com>",
+		"Name <a@company.com>",
+		"a@gmail.com,",
+		"a@gmail.com/x",
+		"a@gmail.com#",
+		"a@gmail.com?x",
+		"a@[gmail.com]",
+		"a@gmail.com;b@company.com",
+		"a@gmail..com",
+		"a@-gmail.com",
+		"a@gmai_l.com",
+		"a@gmail.com.",
+		"a@ｇｍａｉｌ.com",
+		"a@gm\u00adail.com",
+		"a@gm\u200bail.com",
+		"a@gm\xffail.com",
+		"a@1.2.3.45",
+		"a b@company.com",
+	}
+
+	for _, email := range tests {
+		t.Run(email, func(t *testing.T) {
+			t.Parallel()
+
+			if workemailvalidator.IsWorkEmail(email) {
+				t.Errorf("IsWorkEmail(%q) = true, want false", email)
+			}
+		})
+	}
+}
+
+func TestPrivateProvidersAreFreeNotDisposable(t *testing.T) {
+	t.Parallel()
+
+	for _, domain := range []string{"proton.me", "pm.me", "tuta.io", "tutanota.com"} {
+		if workemailvalidator.IsDisposableDomain(domain) {
+			t.Errorf("IsDisposableDomain(%q) = true, want false", domain)
+		}
+
+		if !workemailvalidator.IsFreeDomain(domain) {
+			t.Errorf("IsFreeDomain(%q) = false, want true", domain)
+		}
+	}
+}
+
+func TestDisposableDomainTrailingDot(t *testing.T) {
+	t.Parallel()
+
+	if !workemailvalidator.IsDisposableDomain("mailinator.com.") {
+		t.Error("IsDisposableDomain(\"mailinator.com.\") = false, want true")
 	}
 }

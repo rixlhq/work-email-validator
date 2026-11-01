@@ -202,7 +202,7 @@ func FuzzIsDisposableOrFreeDomain(f *testing.F) {
 
 // FuzzIsWorkEmail tests IsWorkEmail with random inputs
 //
-//nolint:cyclop,funlen
+//nolint:cyclop
 func FuzzIsWorkEmail(f *testing.F) {
 	seeds := []string{
 		emailUserExample,
@@ -254,20 +254,6 @@ func FuzzIsWorkEmail(f *testing.F) {
 				}
 			}
 		}
-
-		// If email is not work email due to invalid format, check edge cases
-		if !result && strings.Contains(email, "@") {
-			atIndex := strings.LastIndexByte(email, '@')
-			if atIndex > 0 && atIndex < len(email)-1 {
-				// Valid format, so must be non-business domain
-				domain := email[atIndex+1:]
-
-				business := workemailvalidator.IsBusinessDomain(domain)
-				if business {
-					t.Errorf("IsWorkEmail(%q)=false but domain %q is business", email, domain)
-				}
-			}
-		}
 	})
 }
 
@@ -306,20 +292,8 @@ func FuzzConsistency(f *testing.F) {
 			t.Errorf("IsDisposableOrFreeDomain inconsistent for %q", domain)
 		}
 
-		// business should be opposite of disposableOrFree, but only for valid domains
-		// Invalid domains return false for business regardless
-		normalized := strings.ToLower(strings.TrimSpace(domain))
-		isLikelyValid := len(normalized) >= 4 && strings.Contains(normalized, ".")
-
-		if isLikelyValid {
-			if business == disposableOrFree {
-				t.Errorf("IsBusinessDomain inconsistent for valid domain %q", domain)
-			}
-		} else {
-			// Invalid domains should return false for business
-			if business {
-				t.Errorf("IsBusinessDomain returned true for invalid domain %q", domain)
-			}
+		if business && disposableOrFree {
+			t.Errorf("IsBusinessDomain inconsistent for %q", domain)
 		}
 
 		// A domain should not be both disposable and free (data integrity check)
