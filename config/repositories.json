@@ -62,10 +62,16 @@
     "url": "https://raw.githubusercontent.com/willwhite/freemail/master/data/free.txt"
   },
   "extra_free_domains": [
+    "keemail.me",
     "pm.me",
     "proton.me",
+    "protonmail.ch",
+    "riseup.net",
+    "tuta.com",
     "tuta.io",
-    "tutanota.com"
+    "tutamail.com",
+    "tutanota.com",
+    "tutanota.de"
   ],
   "exclude_domains": [
     "domain.com",
