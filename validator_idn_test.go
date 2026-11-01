@@ -3,7 +3,7 @@ package workemailvalidator_test
 import (
 	"testing"
 
-	workemailvalidator "github.com/rixlhq/work-email-validator"
+	workemailvalidator "github.com/rixlhq/work-email-validator/v2"
 )
 
 // TestInternationalizedDomains tests support for IDN (Internationalized Domain Names).

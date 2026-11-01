@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	workemailvalidator "github.com/rixlhq/work-email-validator"
+	workemailvalidator "github.com/rixlhq/work-email-validator/v2"
 )
 
 // Benchmark best case - exact match in map.

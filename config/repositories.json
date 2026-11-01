@@ -61,6 +61,12 @@
     "name": "Freemail Providers",
     "url": "https://raw.githubusercontent.com/willwhite/freemail/master/data/free.txt"
   },
+  "extra_free_domains": [
+    "pm.me",
+    "proton.me",
+    "tuta.io",
+    "tutanota.com"
+  ],
   "exclude_domains": [
     "domain.com",
     "example.com",

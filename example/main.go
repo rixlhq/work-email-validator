@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	validator "github.com/rixlhq/work-email-validator"
+	validator "github.com/rixlhq/work-email-validator/v2"
 )
 
 func main() {

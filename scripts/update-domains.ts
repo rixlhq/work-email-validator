@@ -19,6 +19,7 @@ interface Source {
 interface Config {
   disposable_sources: Source[];
   free_source: Source;
+  extra_free_domains: string[];
   exclude_domains: string[];
 }
 
@@ -50,6 +51,10 @@ const OUTPUT_PATHS = {
   disposable: resolve(ROOT_DIR, "data/disposable_domains.txt"),
   free: resolve(ROOT_DIR, "data/free_domains.txt"),
 } as const;
+
+const DOMAIN_PATTERN = /^[a-z0-9-]+(\.[a-z0-9-]+)+$/;
+const MAX_LIST_CHANGE_RATIO = 0.1;
+const FORCE_FLAG = "--force";
 
 // ANSI color codes
 const COLORS = {
@@ -116,7 +121,7 @@ function parseDomainList(text: string): string[] {
   return text
     .split("\n")
     .map((line) => line.trim().toLowerCase())
-    .filter((line) => line && !line.startsWith("#"));
+    .filter((line) => DOMAIN_PATTERN.test(line));
 }
 
 async function downloadFile(url: string, name: string): Promise<string[]> {
@@ -309,6 +314,17 @@ function writeDomainsFile(
   writeFileSync(filename, content, "utf-8");
 }
 
+function assertListSizeChange(filename: string, domains: Set<string>): void {
+  const previous = parseDomainList(readFileSync(filename, "utf-8")).length;
+  const changeRatio = Math.abs(domains.size - previous) / previous;
+
+  if (changeRatio > MAX_LIST_CHANGE_RATIO) {
+    throw new Error(
+      `${filename} would change from ${previous} to ${domains.size} domains, rerun with ${FORCE_FLAG} if this is expected`
+    );
+  }
+}
+
 function loadConfig(): Config {
   try {
     const configContent = readFileSync(CONFIG_FILE, "utf-8");
@@ -343,6 +359,7 @@ async function processDomainsData(config: Config): Promise<ProcessingResult> {
   
   // Download free domains
   let freeDomains = await downloadFreeDomains(config.free_source);
+  config.extra_free_domains.forEach((domain) => freeDomains.add(domain));
   
   // Resolve conflicts (free takes priority)
   const result = resolveConflicts(disposableDomains, freeDomains);
@@ -362,6 +379,11 @@ function writeOutputFiles(
   result: ProcessingResult,
   config: Config
 ): void {
+  if (!process.argv.includes(FORCE_FLAG)) {
+    assertListSizeChange(OUTPUT_PATHS.disposable, result.disposableDomains);
+    assertListSizeChange(OUTPUT_PATHS.free, result.freeDomains);
+  }
+
   const disposableHeader = createDisposableHeader(config.disposable_sources);
   writeDomainsFile(OUTPUT_PATHS.disposable, result.disposableDomains, disposableHeader);
   
