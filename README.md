@@ -21,7 +21,7 @@ A lightweight Go library to verify if an email domain is disposable, free, or bu
 ## Installation
 
 ```bash
-go get github.com/rixlhq/work-email-validator
+go get github.com/rixlhq/work-email-validator/v2
 ```
 
 ## Usage
@@ -32,7 +32,7 @@ package main
 import (
 	"fmt"
 
-	validator "github.com/rixlhq/work-email-validator"
+	validator "github.com/rixlhq/work-email-validator/v2"
 )
 
 func main() {
