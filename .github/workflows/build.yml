@@ -29,13 +29,6 @@ jobs:
       - uses: vladopajic/go-test-coverage@v2
         with:
           config: ./.testcoverage.yml
-      - uses: codecov/codecov-action@v7
-        with:
-          files: ./coverage.out
-          flags: unittests
-          fail_ci_if_error: true
-          token: ${{ secrets.CODECOV_TOKEN }}
-          slug: rixlhq/work-email-validator
 
   release:
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
