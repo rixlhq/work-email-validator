@@ -3,15 +3,21 @@
 package workemailvalidator
 
 import (
+	"net/mail"
 	"strings"
 )
 
-// normalize prepares the domain for lookup: trims spaces, converts to ASCII (for IDN), and lowercases.
-func normalize(domain string) string {
-	domain = strings.TrimSpace(domain)
-	domain = domainToASCII(domain)
+// normalize prepares the domain for lookup and reports whether it is a valid DNS name.
+// Invalid names are still lowercased so they can be matched against the lists.
+func normalize(domain string) (string, bool) {
+	domain = strings.TrimSuffix(strings.TrimSpace(domain), ".")
 
-	return strings.ToLower(domain)
+	ascii, valid := domainToASCII(domain)
+	if !valid {
+		return strings.ToLower(domain), false
+	}
+
+	return ascii, true
 }
 
 // contains checks if the domain or any of its parents exist in the map.
@@ -32,56 +38,46 @@ func contains(domain string, domainMap map[string]struct{}) bool {
 	return false
 }
 
-// isValidDomainSyntax checks structure. Assumes domain is trimmed.
+// isValidDomainSyntax checks the shape of a name that already passed IDNA validation.
 func isValidDomainSyntax(domain string) bool {
-	// Min 4 chars: "a.go" (1 label + 1 dot + 2 TLD)
 	if len(domain) < 4 || len(domain) > 253 {
 		return false
 	}
 
 	lastDotIndex := strings.LastIndexByte(domain, '.')
-
-	// Must have a dot, not at start/end
-	if lastDotIndex <= 0 || lastDotIndex >= len(domain)-1 {
+	if lastDotIndex <= 0 {
 		return false
 	}
 
 	const TLDMinLength = 2
-	if len(domain[lastDotIndex+1:]) < TLDMinLength {
-		return false
-	}
 
-	// Check for invalid chars (spaces, controls)
-	for i := range len(domain) {
-		if domain[i] <= ' ' || domain[i] == 127 {
-			return false
-		}
-	}
+	tld := domain[lastDotIndex+1:]
 
-	return true
+	return len(tld) >= TLDMinLength && strings.Trim(tld, "0123456789") != ""
 }
 
 // IsDisposableDomain checks if the given domain is a disposable/temporary email domain.
 func IsDisposableDomain(domain string) bool {
-	return contains(normalize(domain), disposableDomains)
+	normalized, _ := normalize(domain)
+	return contains(normalized, disposableDomains)
 }
 
 // IsFreeDomain checks if the given domain is a free email provider domain.
 func IsFreeDomain(domain string) bool {
-	return contains(normalize(domain), freeDomains)
+	normalized, _ := normalize(domain)
+	return contains(normalized, freeDomains)
 }
 
 // IsDisposableOrFreeDomain checks if the given domain is either disposable or free.
 func IsDisposableOrFreeDomain(domain string) bool {
-	normalized := normalize(domain)
+	normalized, _ := normalize(domain)
 	return contains(normalized, disposableDomains) || contains(normalized, freeDomains)
 }
 
 // IsBusinessDomain checks if the given domain is neither disposable nor free.
 func IsBusinessDomain(domain string) bool {
-	normalized := normalize(domain)
-
-	if !isValidDomainSyntax(normalized) {
+	normalized, valid := normalize(domain)
+	if !valid || !isValidDomainSyntax(normalized) {
 		return false
 	}
 
@@ -90,13 +86,12 @@ func IsBusinessDomain(domain string) bool {
 
 // IsWorkEmail checks if the given email address is from a business domain.
 func IsWorkEmail(email string) bool {
-	atIndex := strings.LastIndexByte(email, '@')
+	email = strings.TrimSpace(email)
 
-	if atIndex <= 0 || atIndex >= len(email)-1 {
+	address, err := mail.ParseAddress(email)
+	if err != nil || address.Address != email {
 		return false
 	}
 
-	domain := email[atIndex+1:]
-
-	return IsBusinessDomain(domain)
+	return IsBusinessDomain(email[strings.LastIndexByte(email, '@')+1:])
 }
