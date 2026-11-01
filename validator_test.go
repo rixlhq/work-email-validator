@@ -420,7 +420,10 @@ func TestIsWorkEmailRejectsBypasses(t *testing.T) {
 func TestPrivateProvidersAreFreeNotDisposable(t *testing.T) {
 	t.Parallel()
 
-	for _, domain := range []string{"proton.me", "pm.me", "tuta.io", "tutanota.com"} {
+	for _, domain := range []string{
+		"keemail.me", "pm.me", "proton.me", "protonmail.ch", "riseup.net",
+		"tuta.com", "tuta.io", "tutamail.com", "tutanota.com", "tutanota.de",
+	} {
 		if workemailvalidator.IsDisposableDomain(domain) {
 			t.Errorf("IsDisposableDomain(%q) = true, want false", domain)
 		}

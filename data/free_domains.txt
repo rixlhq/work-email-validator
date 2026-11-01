@@ -1482,6 +1482,7 @@ katamail.com
 kayafmmail.co.za
 kbjrmail.com
 kcks.com
+keemail.me
 keftamail.com
 keg-party.com
 keko.com.ar
@@ -3522,6 +3523,7 @@ prontomail.com
 prontomail.compopulus.net
 protestant.com
 proton.me
+protonmail.ch
 protonmail.com
 prydirect.info
 psv-supporter.com
@@ -3611,6 +3613,7 @@ richmondhill.com
 rickymail.com
 rin.ru
 riopreto.com.br
+riseup.net
 rk9.chickenkiller.com
 rn.com
 ro.ru
@@ -4069,8 +4072,11 @@ turboprinz.de
 turboprinzessin.de
 turkey.com
 tut.by
+tuta.com
 tuta.io
+tutamail.com
 tutanota.com
+tutanota.de
 tvstar.com
 twc.com
 twinstarsmail.com
