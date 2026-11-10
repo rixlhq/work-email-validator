@@ -74,6 +74,7 @@
     "tutanota.de"
   ],
   "exclude_domains": [
+    "com.ar",
     "domain.com",
     "example.com",
     "example.net",
