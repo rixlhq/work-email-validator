@@ -54,6 +54,7 @@ func TestIsDisposableDomain(t *testing.T) {
 		{"gmail_not_disposable", domainGmail, false},
 		{"business_domain", domainExample, false},
 		{"corporate_domain", domainBusiness, false},
+		{"com_ar_not_disposable", "empresa.com.ar", false},
 
 		// Edge cases
 		{nameEmptyString, "", false},
@@ -176,6 +177,7 @@ func TestIsBusinessDomain(t *testing.T) {
 		{"corporate", domainBusiness, true},
 		{"startup", "startupname.io", true},
 		{"enterprise", "bigcorp.net", true},
+		{"argentine_business_domain", "empresa.com.ar", true},
 
 		// Non-business (free)
 		{nameFreeGmail, domainGmail, false},
@@ -216,6 +218,7 @@ func TestIsWorkEmail(t *testing.T) {
 		{"valid_work", emailUserMailCompany, true},
 		{"valid_work_2", emailContactExample, true},
 		{"valid_work_subdomain", "admin@mail.company.com", true},
+		{"argentine_work_email", "contacto@empresa.com.ar", true},
 
 		// Non-work (free)
 		{"free_gmail", emailUserGmail, false},
