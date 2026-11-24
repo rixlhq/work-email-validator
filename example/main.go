@@ -1,16 +1,24 @@
+// Command example demonstrates basic usage of the work-email-validator package.
 package main
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	validator "github.com/rixlhq/work-email-validator/v2"
 )
 
+const headerWidth = 49
+
+func outf(format string, args ...any) {
+	_, _ = fmt.Fprintf(os.Stdout, format, args...)
+}
+
 func main() {
-	fmt.Println("Work Email Validator - Example Usage")
-	fmt.Println("=" + strings.Repeat("=", 49))
-	fmt.Println()
+	outf("Work Email Validator - Example Usage\n")
+	outf("%s\n", "="+strings.Repeat("=", headerWidth))
+	outf("\n")
 
 	testDomains := []string{
 		"gmail.com",
@@ -24,14 +32,15 @@ func main() {
 	}
 
 	for _, domain := range testDomains {
-		fmt.Printf("Domain: %-25s\n", domain)
-		fmt.Printf("  ├─ Disposable: %-5t\n", validator.IsDisposableDomain(domain))
-		fmt.Printf("  ├─ Free:       %-5t\n", validator.IsFreeDomain(domain))
-		fmt.Printf("  └─ Business:   %-5t\n", validator.IsBusinessDomain(domain))
-		fmt.Println()
+		outf("Domain: %-25s\n", domain)
+		outf("  ├─ Disposable: %-5t\n", validator.IsDisposableDomain(domain))
+		outf("  ├─ Free:       %-5t\n", validator.IsFreeDomain(domain))
+		outf("  └─ Business:   %-5t\n", validator.IsBusinessDomain(domain))
+		outf("\n")
 	}
 
-	fmt.Println("\nExtract domain from email and validate:")
+	outf("\nExtract domain from email and validate:\n")
+
 	emails := []string{
 		"user@gmail.com",
 		"contact@mycompany.com",
@@ -39,10 +48,8 @@ func main() {
 	}
 
 	for _, email := range emails {
-		parts := strings.Split(email, "@")
-		if len(parts) == 2 {
-			domain := parts[1]
-			fmt.Printf("Email: %s → Domain: %s (Business: %t)\n",
+		if domain, _, ok := strings.Cut(email, "@"); ok {
+			outf("Email: %s → Domain: %s (Business: %t)\n",
 				email, domain, validator.IsBusinessDomain(domain))
 		}
 	}
