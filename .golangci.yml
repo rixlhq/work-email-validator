@@ -4,11 +4,10 @@ linters:
   disable:
     - cyclop # duplicate of gocyclo
     - depguard
+    - exhaustruct # deprecated: replaced by exhaustruct_v5 (kept enabled via default:all)
     - gochecknoglobals
+    - gomodguard # deprecated: replaced by gomodguard_v2 (kept enabled via default:all)
     - nlreturn
     - rowserrcheck # not relevant (SQL)
     - sqlclosecheck # not relevant (SQL)
     - wsl # Deprecated
-  exclusions:
-    paths:
-      - example*
