@@ -48,7 +48,7 @@ func main() {
 	}
 
 	for _, email := range emails {
-		if domain, _, ok := strings.Cut(email, "@"); ok {
+		if _, domain, ok := strings.Cut(email, "@"); ok {
 			outf("Email: %s → Domain: %s (Business: %t)\n",
 				email, domain, validator.IsBusinessDomain(domain))
 		}
